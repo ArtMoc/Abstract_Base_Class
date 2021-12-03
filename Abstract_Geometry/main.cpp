@@ -205,7 +205,7 @@ namespace Geometry
 			ReleaseDC(hwnd, hdc);
 		}
 	};
-	
+
 	class Circle :public Shape
 	{
 		double radius;
@@ -220,8 +220,8 @@ namespace Geometry
 			if (radius <= 0)radius = 1;
 			this->radius = radius;
 		}
-		Circle(double radius, Color color, unsigned int width = 5, 
-			unsigned int start_x = 100, 
+		Circle(double radius, Color color, unsigned int width = 5,
+			unsigned int start_x = 100,
 			unsigned int start_y = 100) :Shape(color, width, start_x, start_y)
 		{
 			set_radius(radius);
@@ -248,13 +248,12 @@ namespace Geometry
 			HBRUSH hBrush = CreateSolidBrush(color);
 			SelectObject(hdc, hBrush);
 
-			::Ellipse(hdc, start_x, start_y, start_x + 2 * radius, start_y + 2 * radius);
+			::Ellipse(hdc, start_x, start_y, start_x + 2*radius, start_y + 2*radius);
 			DeleteObject(hBrush);
 			DeleteObject(hpen);
 			ReleaseDC(hwnd, hdc);
 		}
 	};
-
 }
 
 void main()
@@ -284,4 +283,5 @@ void main()
 	ellip2.draw();
 	Geometry::Circle ellip3(50, Geometry::Color::red, 5, 200, 100);
 	ellip3.draw();
+
 }
