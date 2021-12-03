@@ -1,14 +1,13 @@
-#include <iostream>
+п»ї#include <iostream>
 #include <string>
 #include <Windows.h>
 using namespace std;
-
 
 namespace Geometry
 {
 	enum Color
 	{
-		console_gray = 0x88,  //0x88 - 16-тиричный код цвета
+		console_gray = 0x88,  //0x88 - 16-С‚РёСЂРёС‡РЅС‹Р№ РєРѕРґ С†РІРµС‚Р°
 		console_blue = 0x99,
 		console_green = 0xAA,
 		console_red = 0xCC,
@@ -22,7 +21,7 @@ namespace Geometry
 		yellow = 0x0000FFFF
 
 	};
-	//enum - перечисление. Перечисление - набор именованных констант типа int.
+	//enum - РїРµСЂРµС‡РёСЃР»РµРЅРёРµ. РџРµСЂРµС‡РёСЃР»РµРЅРёРµ - РЅР°Р±РѕСЂ РёРјРµРЅРѕРІР°РЅРЅС‹С… РєРѕРЅСЃС‚Р°РЅС‚ С‚РёРїР° int.
 
 	const char* console_color[] =
 	{
@@ -37,8 +36,8 @@ namespace Geometry
 	{
 	protected:
 		Color color;
-		unsigned int width; //ширина линии
-		//Начальные координаты для рисования фигуры
+		unsigned int width; //С€РёСЂРёРЅР° Р»РёРЅРёРё
+		//РќР°С‡Р°Р»СЊРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹ РґР»СЏ СЂРёСЃРѕРІР°РЅРёСЏ С„РёРіСѓСЂС‹
 		unsigned int start_x;
 		unsigned int start_y;
 	public:
@@ -183,26 +182,26 @@ namespace Geometry
 		}
 		void draw()const
 		{
-			//1) получаем окно консоли
+			//1) РїРѕР»СѓС‡Р°РµРј РѕРєРЅРѕ РєРѕРЅСЃРѕР»Рё
 			HWND hwnd = GetConsoleWindow();
 			//HWND hwnd = FindWindow(NULL, L"Abstract_Base_Class - Microsoft Visual Studio");
-			//2) создаем контекст устройства полученного окна
+			//2) СЃРѕР·РґР°РµРј РєРѕРЅС‚РµРєСЃС‚ СѓСЃС‚СЂРѕР№СЃС‚РІР° РїРѕР»СѓС‡РµРЅРЅРѕРіРѕ РѕРєРЅР°
 			HDC hdc = GetDC(hwnd);
-			//3) создаем карандаш
-			HPEN hpen = CreatePen(PS_SOLID, 5, color);//PS_SOLID -сплошная линия, 5 - толщина(писк)
-			//4) прежде, чем рисовать, нужно выбрать чем и на чем рисовать
+			//3) СЃРѕР·РґР°РµРј РєР°СЂР°РЅРґР°С€
+			HPEN hpen = CreatePen(PS_SOLID, 5, color);//PS_SOLID -СЃРїР»РѕС€РЅР°СЏ Р»РёРЅРёСЏ, 5 - С‚РѕР»С‰РёРЅР°(РїРёСЃРє)
+			//4) РїСЂРµР¶РґРµ, С‡РµРј СЂРёСЃРѕРІР°С‚СЊ, РЅСѓР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ С‡РµРј Рё РЅР° С‡РµРј СЂРёСЃРѕРІР°С‚СЊ
 			SelectObject(hdc, hpen);
 
-			//5) чтобы фигура была закрашена, нужно создать и применить кисть
+			//5) С‡С‚РѕР±С‹ С„РёРіСѓСЂР° Р±С‹Р»Р° Р·Р°РєСЂР°С€РµРЅР°, РЅСѓР¶РЅРѕ СЃРѕР·РґР°С‚СЊ Рё РїСЂРёРјРµРЅРёС‚СЊ РєРёСЃС‚СЊ
 			HBRUSH hBrush = CreateSolidBrush(color);
 			SelectObject(hdc, hBrush);
 
 			::Rectangle(hdc, start_x, start_y, start_x + side2, start_y + side1);
 
 			DeleteObject(hBrush);
-			//?) удаляем карандаш
+			//?) СѓРґР°Р»СЏРµРј РєР°СЂР°РЅРґР°С€
 			DeleteObject(hpen);
-			//?) все контексты устройств нужно удалят, чтобы освободить занимаемые ими ресурсы
+			//?) РІСЃРµ РєРѕРЅС‚РµРєСЃС‚С‹ СѓСЃС‚СЂРѕР№СЃС‚РІ РЅСѓР¶РЅРѕ СѓРґР°Р»СЏС‚, С‡С‚РѕР±С‹ РѕСЃРІРѕР±РѕРґРёС‚СЊ Р·Р°РЅРёРјР°РµРјС‹Рµ РёРјРё СЂРµСЃСѓСЂСЃС‹
 			ReleaseDC(hwnd, hdc);
 		}
 	};
@@ -268,8 +267,8 @@ void main()
 	setlocale(LC_ALL, "");
 
 	/*Geometry::Square square(5, Geometry::Color::console_red);
-	cout << "Площадь квадрата: " << square.get_area() << endl;
-	cout << "Периметр квадрата: " << square.get_perimeter() << endl;
+	cout << "РџР»РѕС‰Р°РґСЊ РєРІР°РґСЂР°С‚Р°: " << square.get_area() << endl;
+	cout << "РџРµСЂРёРјРµС‚СЂ РєРІР°РґСЂР°С‚Р°: " << square.get_perimeter() << endl;
 	square.draw();*/
 
 	/*Geometry::Rectangle rect(100, 200, Geometry::Color::yellow, 5, 200, 100);
