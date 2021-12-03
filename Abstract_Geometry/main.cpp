@@ -184,8 +184,8 @@ namespace Geometry
 		void draw()const
 		{
 			//1) получаем окно консоли
-			//HWND hwnd = GetConsoleWindow();
-			HWND hwnd = FindWindow(NULL, L"Abstract_Base_Class - Microsoft Visual Studio");
+			HWND hwnd = GetConsoleWindow();
+			//HWND hwnd = FindWindow(NULL, L"Abstract_Base_Class - Microsoft Visual Studio");
 			//2) создаем контекст устройства полученного окна
 			HDC hdc = GetDC(hwnd);
 			//3) создаем карандаш
@@ -206,16 +206,83 @@ namespace Geometry
 			ReleaseDC(hwnd, hdc);
 		}
 	};
+	
+	class Circle :public Shape
+	{
+		double radius;
+		CONST double PI = 3.14;
+	public:
+		double get_radius()const
+		{
+			return radius;
+		}
+		void set_radius(double radius)
+		{
+			if (radius <= 0)radius = 1;
+			this->radius = radius;
+		}
+		Circle(double radius, Color color, unsigned int width = 5, 
+			unsigned int start_x = 100, 
+			unsigned int start_y = 100) :Shape(color, width, start_x, start_y)
+		{
+			set_radius(radius);
+		}
+		~Circle()
+		{
+
+		}
+
+		double get_area()const
+		{
+			return PI * pow(radius, 2);
+		}
+		double get_perimeter()const
+		{
+			return 2 * PI * radius;
+		}
+		void draw()const
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hpen = CreatePen(PS_SOLID, 5, color);
+			SelectObject(hdc, hpen);
+			HBRUSH hBrush = CreateSolidBrush(color);
+			SelectObject(hdc, hBrush);
+
+			::Ellipse(hdc, start_x, start_y, start_x + 2 * radius, start_y + 2 * radius);
+			DeleteObject(hBrush);
+			DeleteObject(hpen);
+			ReleaseDC(hwnd, hdc);
+		}
+	};
+
 }
 
 void main()
 {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	COORD buffer = { 80, 50 };
+	SetConsoleDisplayMode(hConsole, CONSOLE_FULLSCREEN, &buffer);
+	system("pause");
+
 	setlocale(LC_ALL, "");
+
 	/*Geometry::Square square(5, Geometry::Color::console_red);
 	cout << "Площадь квадрата: " << square.get_area() << endl;
 	cout << "Периметр квадрата: " << square.get_perimeter() << endl;
 	square.draw();*/
 
-	Geometry::Rectangle rect(100, 200, Geometry::Color::yellow, 5, 200, 100);
-	rect.draw();
+	/*Geometry::Rectangle rect(100, 200, Geometry::Color::yellow, 5, 200, 100);
+	rect.draw();*/
+
+	Geometry::Circle ellip(150, Geometry::Color::green, 5, 200, 100);
+	cout << "Area of circle: " << ellip.get_area() << endl;
+	cout << "Perimeter of circle: " << ellip.get_perimeter() << endl;
+	ellip.draw();
+	Geometry::Circle ellip1(100, Geometry::Color::blue, 5, 200, 100);
+	ellip1.draw();
+	Geometry::Circle ellip2(70, Geometry::Color::yellow, 5, 200, 100);
+	ellip2.draw();
+	Geometry::Circle ellip3(50, Geometry::Color::red, 5, 200, 100);
+	ellip3.draw();
 }
