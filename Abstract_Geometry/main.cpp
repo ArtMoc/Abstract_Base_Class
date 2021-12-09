@@ -1,6 +1,7 @@
 ﻿#include <iostream>
-#include <string>
+#include <conio.h>
 #include <Windows.h>
+#include <thread>
 using namespace std;
 
 namespace Geometry
@@ -18,8 +19,8 @@ namespace Geometry
 		green = 0x0000FF00,
 		darkgreen = 0x0000AA00,
 		blue = 0x00FF0000,
-		yellow = 0x0000FFFF
-
+		yellow = 0x0000FFFF,
+		white = 0x00FFFFFF
 	};
 	//enum - перечисление. Перечисление - набор именованных констант типа int.
 
@@ -204,6 +205,13 @@ namespace Geometry
 			//?) все контексты устройств нужно удалят, чтобы освободить занимаемые ими ресурсы
 			ReleaseDC(hwnd, hdc);
 		}
+		void start_draw()const
+		{
+			while (true)
+			{
+				draw();
+			}
+		}
 	};
 
 	class Circle :public Shape
@@ -248,10 +256,96 @@ namespace Geometry
 			HBRUSH hBrush = CreateSolidBrush(color);
 			SelectObject(hdc, hBrush);
 
-			::Ellipse(hdc, start_x, start_y, start_x + 2*radius, start_y + 2*radius);
+			::Ellipse(hdc, start_x, start_y, start_x + 2 * radius, start_y + 2 * radius);
 			DeleteObject(hBrush);
 			DeleteObject(hpen);
 			ReleaseDC(hwnd, hdc);
+		}
+	};
+
+	class Triangle :public Shape
+	{
+		//Этот класс является абстрактным, поскольку треугольники бывают:
+		//равносторонний, равнобедренный, прямоугольный, тупоугольный, остроугольный
+	public:
+		Triangle(Color color, unsigned int width, unsigned int start_x, unsigned int start_y)
+			:Shape(color, width, start_x, start_y)
+		{
+
+		}
+		~Triangle()
+		{
+
+		}
+		virtual double get_height()const = 0;// но мы знаем, что у каждого
+								 //треугольника есть высота и как ее вычислить
+								 //зависит от конкретного типа треугольника
+	};
+	class EquilateralTriangle :public Triangle
+	{
+
+		double side;
+	public:
+		double get_side()const
+		{
+			return side;
+		}
+		double get_height()const
+		{
+			return sqrt(pow(side, 2) - pow(side / 2, 2));
+		}
+		void set_side(double side)
+		{
+			if (side <= 0)side = 1;
+			this->side = side;
+		}
+		double get_area()const
+		{
+			return side * side * sqrt(3) / 4;
+		}
+		double get_perimeter()const
+		{
+			return side * 3;
+		}
+		void draw()const
+		{
+			HWND hwnd = GetConsoleWindow();
+			HDC hdc = GetDC(hwnd);
+			HPEN hpen = CreatePen(PS_SOLID, width, color);
+			HBRUSH hBrush = CreateSolidBrush(color);
+			SelectObject(hdc, hpen);
+			SelectObject(hdc, hBrush);
+
+			const POINT points[] =
+			{
+				{start_x, start_y + this->get_height()},
+				{start_x + side, start_y + this->get_height()},
+				{start_x + side / 2, start_y}
+			};
+			Polygon(hdc, points, sizeof(points) / sizeof(POINT));
+
+			DeleteObject(hBrush);
+			DeleteObject(hpen);
+			ReleaseDC(hwnd, hdc);
+		}
+		void start_draw()const
+		{
+			while (true)
+			{
+				draw();
+
+			}
+		}
+		EquilateralTriangle(double side, Color color = Color::green,
+			unsigned int width = 5,
+			unsigned int start_x = 100, unsigned int start_y = 100)
+			:Triangle(color, width, start_x, start_y)
+		{
+			set_side(side);
+		}
+		~EquilateralTriangle()
+		{
+
 		}
 	};
 }
@@ -270,10 +364,19 @@ void main()
 	cout << "Периметр квадрата: " << square.get_perimeter() << endl;
 	square.draw();*/
 
-	/*Geometry::Rectangle rect(100, 200, Geometry::Color::yellow, 5, 200, 100);
-	rect.draw();*/
+	char key = 0;
 
-	Geometry::Circle ellip(150, Geometry::Color::green, 5, 200, 100);
+	Geometry::Rectangle rect1(100, 200, Geometry::Color::yellow, 5, 200, 100);
+	cout << rect1.get_area() << endl;
+	cout << rect1.get_perimeter() << endl;
+	/*while (key != ' ')
+	{
+		rect1.draw();
+		if (_kbhit())key = _getch();
+	}*/
+	std::thread rect1_thread(&Geometry::Rectangle::start_draw, rect1);
+
+	/*Geometry::Circle ellip(150, Geometry::Color::green, 5, 200, 100);
 	cout << "Area of circle: " << ellip.get_area() << endl;
 	cout << "Perimeter of circle: " << ellip.get_perimeter() << endl;
 	ellip.draw();
@@ -282,6 +385,21 @@ void main()
 	Geometry::Circle ellip2(70, Geometry::Color::yellow, 5, 200, 100);
 	ellip2.draw();
 	Geometry::Circle ellip3(50, Geometry::Color::red, 5, 200, 100);
-	ellip3.draw();
+	ellip3.draw();*/
 
+	Geometry::EquilateralTriangle et(300, Geometry::Color::green, 5, 200, 200);
+	cout << et.get_height() << endl;
+	cout << et.get_area() << endl;
+	cout << et.get_perimeter() << endl;
+	//cin.get();
+	key = 0;
+	/*while (key != ' ')
+	{
+		et.draw();
+		if (_kbhit())key = _getch();
+	}*/
+	std::thread et_thread(&Geometry::EquilateralTriangle::start_draw, et);
+	cin.get();
+	et_thread.join();
+	rect1_thread.join();
 }
