@@ -232,10 +232,9 @@ namespace Geometry
 		}
 	};
 
-	class Triangle :public Shape   //Треугольник
+	class Triangle :public Shape 
 	{
-		//Этот класс является абстрактным, поскольку треугольники бывают: 
-		//равносторонние, равнобедренный, прямоугольный, тупоугольный.
+		
 	public:
 		Triangle(Color color, unsigned int width, unsigned int start_x, unsigned int start_y) :Shape(color, width, start_x, start_y)
 		{
@@ -246,11 +245,9 @@ namespace Geometry
 
 		}
 		virtual double get_height()const = 0;
-		//НО, мы знаем, что у каждого треугольника есть высота, и как её вычислить зависит от
-		//конкретного типа треугольника
 	};
 
-	class EquilateralTriangle :public Triangle   //Равносторонний треугольник
+	class EquilateralTriangle :public Triangle  
 	{
 		double side;
 	public:
@@ -305,10 +302,10 @@ namespace Geometry
 		}
 	};
 
-	class IsoscalesTriangle :public Triangle  //Равнобедренный треугольник
+	class IsoscalesTriangle :public Triangle 
 	{
-		double side;             //Сторона треугольника
-		double bottom;           //Основание треугольника
+		double side;            
+		double bottom;           
 	public:
 		double get_side()const
 		{
@@ -369,67 +366,6 @@ namespace Geometry
 		}
 	};
 
-	class RightTriangle :public Triangle        //Прямоугольный треугольник
-	{
-		double bottom;                   //Основание треугольника (Катет 1)
-		double side;                     //Сторона треугольника (Катет 2)
-	public:
-		double get_bottom()const
-		{
-			return bottom;
-		}
-		double get_side()const
-		{
-			return side;
-		}
-		double get_height()const
-		{
-			return sqrt(pow(side, 2) - pow(bottom, 2));
-		}
-		void set_bottom(double bottom)
-		{
-			this->bottom = bottom;
-		}
-		void set_side(double side)
-		{
-			this->side = side;
-		}
-		RightTriangle
-		(
-			double bottom, double side, Color color, unsigned int width, unsigned int start_x, unsigned int start_y
-		) : Triangle(color, width, start_x, start_y)
-		{
-			set_bottom(bottom);
-			set_side(side);
-		}
-		double get_area()const
-		{
-			return (bottom * get_height()) / 2;
-		}
-		double get_perimeter()const
-		{
-			return side + bottom + get_height();
-		}
-		void draw()const
-		{
-			HWND hwnd = GetConsoleWindow();
-			HDC hdc = GetDC(hwnd);
-			HPEN hPen = CreatePen(PS_SOLID, width, color);
-			HBRUSH hBrush = CreateSolidBrush(color);
-
-			const POINT points[] =
-			{
-				{start_x, start_y},
-				{start_x, start_y + this->get_height()},
-				{start_x + this->get_bottom(), start_y + this->get_height()}
-			};
-			::Polygon(hdc, points, sizeof(points) / sizeof(POINT));
-
-			DeleteObject(hPen);
-			DeleteObject(hBrush);
-			ReleaseDC(hwnd, hdc);
-		}
-	};
 
 	class Circle :public Shape             //Круг
 	{
@@ -485,15 +421,11 @@ namespace Geometry
 
 //#define SQUARE
 //#define RECTANGLE
-#define TRIANGLES
+#define TRIANGLE
 //#define CIRCLE
 
 void main()
 {
-	/*HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	COORD buffer = { 80,50 };
-	SetConsoleDisplayMode(hConsole, CONSOLE_FULLSCREEN, &buffer);
-	system("pause");*/
 	setlocale(LC_ALL, "");
 	char key = 0;
 #ifdef SQUARE
@@ -501,7 +433,7 @@ void main()
 	Geometry::Square square(5, Geometry::Color::blue);
 	cout << "Площадь квадрата: " << square.get_area() << endl;
 	cout << "Периметр квадрата: " << square.get_perimeter() << endl;
-	//square.draw();
+	square.draw();
 	std::thread square_thread(&Geometry::Square::start_draw, square);
 #endif // SQUARE
 #ifdef RECTANGLE
@@ -515,7 +447,7 @@ void main()
 	}*/
 	std::thread rect1_thread(&Geometry::Rectangle::start_draw, rect1);
 #endif // RECTANGLE
-#ifdef TRIANGLES
+#ifdef TRIANGLE
 	Geometry::EquilateralTriangle et(300, Geometry::Color::green, 5, 220, 200);
 	cout << "Площадь треугольника: " << et.get_area() << endl;
 	cout << "Высота: " << et.get_height() << endl;
@@ -526,27 +458,22 @@ void main()
 	cout << "Площадь треугольника: " << it.get_area() << endl;
 	cout << "Высота: " << it.get_height() << endl;
 	cout << "Периметр треугольника: " << it.get_perimeter() << endl;
-	std::thread it_thread(&Geometry::IsoscalesTriangle::start_draw, it);    //Открывает поток
+	std::thread it_thread(&Geometry::IsoscalesTriangle::start_draw, it);    
 
-	Geometry::RightTriangle rt(200, 300, Geometry::Color::yellow, 5, 503, 200);
-	cout << "Площадь треугольника: " << rt.get_area() << endl;
-	cout << "Высота: " << rt.get_height() << endl;
-	cout << "Периметр треугольника: " << rt.get_perimeter() << endl;
-	std::thread rt_thread(&Geometry::RightTriangle::start_draw, rt);
-#endif // TRIANGLES
+	
+#endif // TRIANGLE
 #ifdef CIRCLE
 	Geometry::Circle circle(5, Geometry::Color::red);
 	cout << "Площадь круга: " << circle.get_area() << endl;
 	cout << "Периметр круга: " << circle.get_perimeter() << endl;
-	//circle.draw();
+	circle.draw();
 	std::thread circle_thread(&Geometry::Circle::start_draw, circle);
 
 #endif // CIRCLE
-	cin.get();
+	//cin.get();
 	//square_thread.join();
 	//rect1_thread.join();
 	et_thread.join();
-	it_thread.join();                    //Закрывает поток
-	rt_thread.join();
+	it_thread.join();                    
 	//circle_thread.join();
 }
